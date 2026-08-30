@@ -12,5 +12,6 @@ typedef long long SYSTEM_ID;
 typedef long long GECS_ID;
 
 typedef std::string COMPONENT_TYPE;
+typedef std::string SYSTEM_TYPE;
 
 #endif //GECS_TYPES_H

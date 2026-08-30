@@ -13,4 +13,17 @@ add_library(gecs
         src/component.cpp
         include/types.h
         include/system.h
-        src/system.cpp)
+        src/system.cpp
+        src/gecs.cpp)
+
+add_executable(gecs_test
+        include/component.h
+        include/entity.h
+        src/entity.cpp
+        include/gecs.h
+        src/component.cpp
+        include/types.h
+        include/system.h
+        src/system.cpp
+        src/gecs.cpp
+        test/test.cpp)

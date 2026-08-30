@@ -11,6 +11,8 @@ class Component {
     friend class GECS;
 
     COMPONENT_ID _id        = -1;
+    COMPONENT_TYPE _type;
+
     ENTITY_ID _entity_id    = -1;
 
     void set_id(COMPONENT_ID id);
@@ -18,9 +20,11 @@ class Component {
     COMPONENT_ID get_id() const;
     ENTITY_ID get_entity() const;
 
+protected:
+    explicit Component(COMPONENT_TYPE type);
+
 public:
-    explicit Component();
-    virtual ~Component();
+    virtual ~Component() = default;
 };
 
 #endif //GECS_COMPONENT_H

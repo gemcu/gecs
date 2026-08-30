@@ -3,11 +3,13 @@
 //
 #include "component.h"
 
-void Component::set_id(COMPONENT_ID id) {
+#include <utility>
+
+void Component::set_id(const COMPONENT_ID id) {
     this->_id = id;
 }
 
-void Component::set_entity(ENTITY_ID entity_id) {
+void Component::set_entity(const ENTITY_ID entity_id) {
     this->_entity_id = entity_id;
 }
 
@@ -19,5 +21,4 @@ ENTITY_ID Component::get_entity() const {
     return _entity_id;
 }
 
-Component::~Component() = default;
-Component::Component() = default;
+Component::Component(COMPONENT_TYPE type) : _type(std::move(type)) {}

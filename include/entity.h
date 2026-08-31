@@ -14,4 +14,10 @@ public:
     ENTITY_ID getId() const;
 };
 
+inline Entity::Entity(const ENTITY_ID id) : id{id} {}
+
+inline ENTITY_ID Entity::getId() const {
+    return id;
+}
+
 #endif //GECS_ENTITY_H

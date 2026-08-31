@@ -5,8 +5,6 @@
 #ifndef GECS_COMPONENT_H
 #define GECS_COMPONENT_H
 
-#include "entity.h"
-
 class Component {
     friend class GECS;
 
@@ -26,5 +24,24 @@ protected:
 public:
     virtual ~Component() = default;
 };
+
+
+inline void Component::set_id(const COMPONENT_ID id) {
+    this->_id = id;
+}
+
+inline void Component::set_entity(const ENTITY_ID entity_id) {
+    this->_entity_id = entity_id;
+}
+
+inline COMPONENT_ID Component::get_id() const {
+    return _id;
+}
+
+inline ENTITY_ID Component::get_entity() const {
+    return _entity_id;
+}
+
+inline Component::Component(COMPONENT_TYPE type) : _type(std::move(type)) {}
 
 #endif //GECS_COMPONENT_H

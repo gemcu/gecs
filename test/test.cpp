@@ -2,6 +2,8 @@
 // Created by gemcu on 8/30/26.
 //
 
+#include <iostream>
+
 #include "gecs.h"
 
 class Value : public Component {
@@ -14,9 +16,10 @@ public:
 
 class IncrementValue : public System {
     void apply() override {
-        if (hasComponent("VALUE_COMPONENT")) {
-            const auto valueComp = std::dynamic_pointer_cast<Value>(getComponent("VALUE_COMPONENT"));
+        if (hasComponent<Value>()) {
+            const auto valueComp = getComponent<Value>();
             valueComp->setValue(valueComp->getValue() + 1);
+            std::cout << "Incremented value: " << valueComp->getValue() << std::endl;
         }
     }
 public:
@@ -25,10 +28,14 @@ public:
 
 int main() {
 
-    auto comp = std::make_unique<Value>();
+    auto comp = std::make_shared<Value>();
+    auto sys = std::make_shared<IncrementValue>();
 
     GECS gecs{0};
-    gecs.createEntity();
-    gecs.attachComponent(std::move(comp));
-    gecs.run();
+    const ENTITY_ID entity = gecs.createEntity();
+    const COMPONENT_ID comp_id = gecs.addComponent(std::move(comp));
+    const SYSTEM_ID system_id = gecs.addSystem(std::move(sys));
+    gecs.attachComponentToEntity(comp_id, entity);
+    gecs.setPipeline({system_id});
+    for (int i=0; i<10; i++) gecs.run();
 }

@@ -36,8 +36,8 @@ public:
     ENTITY_ID destroyEntity(ENTITY_ID id);
 
     COMPONENT_ID addComponent(std::shared_ptr<Component> component);
-    std::shared_ptr<Component> removeComponent(COMPONENT_ID id);
     SYSTEM_ID addSystem(std::shared_ptr<System> system);
+    std::shared_ptr<Component> removeComponent(COMPONENT_ID id);
     std::shared_ptr<System> removeSystem(SYSTEM_ID id);
     void setPipeline(const std::vector<SYSTEM_ID>& pipeline);
 
@@ -45,8 +45,6 @@ public:
     void detachComponentFromEntity(COMPONENT_ID comp_id) const;
 
     void run() const;
-
-    virtual ~GECS();
 };
 
 inline GECS::GECS(const GECS_ID id) : _id{id} {
@@ -104,7 +102,7 @@ inline SYSTEM_ID GECS::addSystem(std::shared_ptr<System> system) {
     for (const auto& s : _system_map)
         if (id <= s.first) id = s.first + 1;
     system->set_id(id);
-    system->set_gecs(this);
+    system->set_gecs(std::make_shared<GECS>(*this));
     _system_map.insert({id, std::move(system)});
     return id;
 }
@@ -136,8 +134,6 @@ inline void GECS::run() const{
         }
     }
 }
-
-inline GECS::~GECS() = default;
 
 template<class T>
 std::shared_ptr<T> GECS::get_component(const ENTITY_ID id) {

@@ -5,6 +5,8 @@
 #ifndef GECS_COMPONENT_H
 #define GECS_COMPONENT_H
 
+#include "types.h"
+
 class Component {
     friend class GECS;
 

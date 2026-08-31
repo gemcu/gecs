@@ -9,7 +9,6 @@
 class Value : public Component {
     int _value = 0;
 public:
-    Value() : Component("VALUE_COMPONENT") {}
     int getValue() const {return _value;}
     void setValue(const int value) {this->_value = value;}
 };
@@ -22,8 +21,6 @@ class IncrementValue : public System {
             std::cout << "Incremented value: " << valueComp->getValue() << std::endl;
         }
     }
-public:
-    IncrementValue() : System("INCREMENT_VALUE_SYSTEM") {}
 };
 
 int main() {
@@ -37,5 +34,6 @@ int main() {
     const SYSTEM_ID system_id = gecs.addSystem(std::move(sys));
     gecs.attachComponentToEntity(comp_id, entity);
     gecs.setPipeline({system_id});
+
     for (int i=0; i<10; i++) gecs.run();
 }

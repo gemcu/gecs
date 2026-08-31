@@ -16,7 +16,6 @@ class System {
     friend class GECS;
 
     SYSTEM_ID _id   = -1;
-    SYSTEM_TYPE _type;
 
     ENTITY_ID _entity = -1;
     virtual void apply() = 0;
@@ -30,7 +29,7 @@ class System {
     GECS* get_gecs() const;
 
 protected:
-    explicit System(SYSTEM_TYPE type);
+    explicit System();
 
     template <class T> bool hasComponent() const;
     template <class T> std::shared_ptr<T> getComponent();
@@ -60,5 +59,5 @@ inline GECS* System::get_gecs() const {
     return _gecs;
 }
 
-inline System::System(SYSTEM_TYPE type) : _type(std::move(type)), _gecs{nullptr} {}
+inline System::System() :  _gecs{nullptr} {}
 #endif //GECS_SYSTEM_H

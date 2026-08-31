@@ -9,8 +9,6 @@ class Component {
     friend class GECS;
 
     COMPONENT_ID _id        = -1;
-    COMPONENT_TYPE _type;
-
     ENTITY_ID _entity_id    = -1;
 
     void set_id(COMPONENT_ID id);
@@ -19,7 +17,7 @@ class Component {
     ENTITY_ID get_entity() const;
 
 protected:
-    explicit Component(COMPONENT_TYPE type);
+    explicit Component();
 
 public:
     virtual ~Component() = default;
@@ -42,6 +40,6 @@ inline ENTITY_ID Component::get_entity() const {
     return _entity_id;
 }
 
-inline Component::Component(COMPONENT_TYPE type) : _type(std::move(type)) {}
+inline Component::Component() {}
 
 #endif //GECS_COMPONENT_H

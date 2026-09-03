@@ -129,9 +129,11 @@ inline void GECS::setPipeline(const std::vector<SYSTEM_ID>& pipeline) {
 inline void GECS::run() const{
     for (const auto s : _pipeline) {
         const auto& system = _system_map.at(s);
+        system->pre();
         for (const auto e : _entity_map) {
             system->apply_for(e.first);
         }
+        system->post();
     }
 }
 

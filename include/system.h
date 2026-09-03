@@ -19,7 +19,9 @@ class System {
     ENTITY_ID _entity = -1;
     std::shared_ptr<GECS> _gecs;
 
-    virtual void apply() = 0;
+    virtual void pre();
+    virtual void post();
+    virtual void apply();
     void apply_for(ENTITY_ID entity);
 
     void set_id(SYSTEM_ID id);
@@ -36,6 +38,12 @@ protected:
 public:
     virtual ~System() = default;
 };
+
+inline void System::pre() {}
+
+inline void System::post() {}
+
+inline void System::apply() {}
 
 inline void System::apply_for(const ENTITY_ID entity) {
     _entity = entity;

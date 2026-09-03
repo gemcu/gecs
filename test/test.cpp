@@ -14,12 +14,18 @@ public:
 };
 
 class IncrementValue : public System {
+    void pre() override {
+        std::cout << "Begin increment";
+    }
     void apply() override {
         if (hasComponent<Value>()) {
             const auto valueComp = getComponent<Value>();
             valueComp->setValue(valueComp->getValue() + 1);
             std::cout << "Incremented value: " << valueComp->getValue() << std::endl;
         }
+    }
+    void post() override {
+        std::cout << "End increment";
     }
 };
 

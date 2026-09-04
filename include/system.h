@@ -17,7 +17,7 @@ class System {
 
     SYSTEM_ID _id   = -1;
     ENTITY_ID _entity = -1;
-    std::shared_ptr<GECS> _gecs;
+    GECS* _gecs;
 
     virtual void pre();
     virtual void post();
@@ -25,10 +25,10 @@ class System {
     void apply_for(ENTITY_ID entity);
 
     void set_id(SYSTEM_ID id);
-    void set_gecs(const std::shared_ptr<GECS> &gecs);
+    void set_gecs(GECS* gecs);
 
     SYSTEM_ID get_id() const;
-    std::shared_ptr<GECS> get_gecs() const;
+    GECS* get_gecs() const;
 
 protected:
     explicit System();
@@ -58,11 +58,11 @@ inline SYSTEM_ID System::get_id() const {
     return this->_id;
 }
 
-inline void System::set_gecs(const std::shared_ptr<GECS> &gecs) {
+inline void System::set_gecs(GECS* gecs) {
     this->_gecs = gecs;
 }
 
-inline std::shared_ptr<GECS> System::get_gecs() const {
+inline GECS* System::get_gecs() const {
     return _gecs;
 }
 

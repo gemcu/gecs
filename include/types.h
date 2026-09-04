@@ -4,7 +4,6 @@
 
 #ifndef GECS_TYPES_H
 #define GECS_TYPES_H
-#include <string>
 
 typedef long long ENTITY_ID;
 typedef long long COMPONENT_ID;

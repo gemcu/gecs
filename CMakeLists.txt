@@ -13,10 +13,10 @@ add_library(gecs
         include/system.h)
 set_target_properties(gecs PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(gecs_test
+add_executable(gecs_increment_example
         include/component.h
         include/entity.h
         include/gecs.h
         include/types.h
         include/system.h
-        test/test.cpp)
+        examples/increment.cpp)

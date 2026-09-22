@@ -7,17 +7,27 @@
 
 #include "types.h"
 
+#include "component.h"
+
+class GECS;
+
 class Entity {
-    const ENTITY_ID id  = -1;
+    friend class GECS;
+    const ENTITY_ID _id;
+    GECS* _gecs;
+    explicit Entity(ENTITY_ID id, GECS* gecs);
 public:
-    explicit Entity(ENTITY_ID id);
     ENTITY_ID getId() const;
+    template <class T> bool has() const;
+    template <class T> std::shared_ptr<T> get() const;
+    template <class T> COMPONENT_ID attach(std::shared_ptr<T> component);
+    template <class T> std::shared_ptr<T> detach();
 };
 
-inline Entity::Entity(const ENTITY_ID id) : id{id} {}
+inline Entity::Entity(const ENTITY_ID id, GECS* gecs) : _id{id}, _gecs(gecs) {}
 
 inline ENTITY_ID Entity::getId() const {
-    return id;
+    return _id;
 }
 
 #endif //GECS_ENTITY_H

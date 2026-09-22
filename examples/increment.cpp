@@ -18,29 +18,28 @@ namespace {
 
         int iteration_count = 0;
 
-        void pre() override {
+        void start(const std::vector<Entity>& entities) override {
             iteration_count++;
             std::cout << "iteration " << iteration_count << " begin...\n";
         }
-        void apply() override {
-            if (hasComponent<Value>()) {
-                const auto valueComp = getComponent<Value>();
+        void forEach(const Entity& entity) override {
+            if (entity.has<Value>()) {
+                const auto valueComp = entity.get<Value>();
                 valueComp->setValue(valueComp->getValue() + 1);
                 std::cout << "Incremented value: " << valueComp->getValue() << "\n";
             }
         }
-        void post() override {
+        void finish(const std::vector<Entity>& entities) override {
             std::cout << "iteration " << iteration_count << " end.\n";
         }
     };
 
     void createIncrementable(GECS& gecs, const int value = 0) {
-        auto comp = std::make_shared<Value>();
+        const auto comp = std::make_shared<Value>();
         comp->setValue(value);
         auto sys = std::make_shared<IncrementValue>();
-
-        const ENTITY_ID entity = gecs.createEntity();
-        gecs.createAndAttachComponent(comp, entity);
+        Entity entity = gecs.createEntity();
+        entity.attach(comp);
     }
 }
 
@@ -53,5 +52,5 @@ int main() {
 
     for (int i=0; i<5; i++) createIncrementable(gecs, (i*5)-10);
     for (int i=0; i<10; i++)
-        gecs.run();
+        gecs.tick();
 }

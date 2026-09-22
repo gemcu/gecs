@@ -7,41 +7,35 @@
 
 #include "types.h"
 
+class GECS;
+
 class Component {
     friend class GECS;
+    COMPONENT_ID _id;
+    GECS* _gecs;
+    explicit Component(COMPONENT_ID id, GECS* gecs);
 
-    COMPONENT_ID _id        = -1;
-    ENTITY_ID _entity_id    = -1;
-
-    void set_id(COMPONENT_ID id);
+    ENTITY_ID _entity_id = -1;
     void set_entity(ENTITY_ID entity_id);
     COMPONENT_ID get_id() const;
     ENTITY_ID get_entity() const;
-
 protected:
-    explicit Component();
-
 public:
+    Component();
+    [[nodiscard]] COMPONENT_ID getId() const;
     virtual ~Component() = default;
 };
 
+inline Component::Component() {}
 
-inline void Component::set_id(const COMPONENT_ID id) {
-    this->_id = id;
-}
-
-inline void Component::set_entity(const ENTITY_ID entity_id) {
-    this->_entity_id = entity_id;
-}
+inline Component::Component(const COMPONENT_ID id, GECS* gecs) : _id{id}, _gecs{gecs} {}
 
 inline COMPONENT_ID Component::get_id() const {
     return _id;
 }
 
-inline ENTITY_ID Component::get_entity() const {
-    return _entity_id;
+inline void Component::set_entity(const ENTITY_ID entity_id) {
+    this->_entity_id = entity_id;
 }
-
-inline Component::Component() {}
 
 #endif //GECS_COMPONENT_H

@@ -17,9 +17,12 @@
 #include "system.h"
 
 class GECS {
+
+    friend class Entity;
     friend class System;
 
     const GECS_ID _id;
+    long _tickCount = 0;
     std::unordered_map<ENTITY_ID, Entity> _entity_map;
     std::unordered_map<COMPONENT_ID, std::shared_ptr<Component>> _component_map;
     std::unordered_map<SYSTEM_ID, std::shared_ptr<System>> _system_map;
@@ -33,18 +36,22 @@ class GECS {
     template <class T> std::shared_ptr<T> get_component(ENTITY_ID id);
     template <class T> bool has_component(ENTITY_ID id) const;
 
+
+
+
 public:
     explicit GECS(GECS_ID id);
 
-    ENTITY_ID createEntity();
-    ENTITY_ID destroyEntity(ENTITY_ID id);
+    Entity createEntity();
+    Entity getEntity(ENTITY_ID id);
+    std::vector<Entity> getEntities() const;
+    void destroyEntity(ENTITY_ID id);
 
     COMPONENT_ID addComponent(const std::shared_ptr<Component>& component);
     std::vector<COMPONENT_ID> addComponents(const std::vector<std::shared_ptr<Component>>& components);
 
     std::shared_ptr<Component> removeComponent(COMPONENT_ID id);
     std::vector<std::shared_ptr<Component>> removeComponents(const std::vector<COMPONENT_ID>& ids);
-
 
     SYSTEM_ID addSystem(std::shared_ptr<System> system);
     std::shared_ptr<System> removeSystem(SYSTEM_ID id);
@@ -58,7 +65,7 @@ public:
     COMPONENT_ID createAndAttachComponent(const std::shared_ptr<Component> &component, ENTITY_ID entity_id);
     std::vector<COMPONENT_ID> createAndAttachComponents(const std::vector<std::shared_ptr<Component>>& components, ENTITY_ID entityId);
 
-    void run() const;
+    void tick();
 };
 
 inline ENTITY_ID GECS::_next_entity_id() const {
@@ -85,15 +92,27 @@ inline SYSTEM_ID GECS::_next_system_id() const {
 inline GECS::GECS(const GECS_ID id) : _id{id} {
 }
 
-inline ENTITY_ID GECS::createEntity() {
+inline Entity GECS::createEntity() {
     ENTITY_ID id = _next_entity_id();
-    _entity_map.insert({id, Entity{id}});
-    return id;
+    Entity entity = Entity{id, this};
+    _entity_map.insert({id, entity});
+    return entity;
 }
 
-inline ENTITY_ID GECS::destroyEntity(const ENTITY_ID id) {
+inline Entity GECS::getEntity(ENTITY_ID id) {
+    return _entity_map.at(id);
+}
+
+inline std::vector<Entity> GECS::getEntities() const {
+    auto entities = std::vector<Entity>();
+    for (auto it = _entity_map.cbegin(); it != _entity_map.cend(); ++it) {
+        entities.push_back(it->second);
+    }
+    return entities;
+}
+
+inline void GECS::destroyEntity(const ENTITY_ID id) {
     _entity_map.erase(id);
-    return id;
 }
 
 inline COMPONENT_ID GECS::addComponent(const std::shared_ptr<Component>& component) {
@@ -199,21 +218,23 @@ inline void GECS::setPipeline(const std::vector<SYSTEM_ID>& pipeline) {
     _pipeline = pipeline;
 }
 
-inline void GECS::run() const{
+inline void GECS::tick(){
     for (const auto s : _pipeline) {
         const auto& system = _system_map.at(s);
-        system->pre();
+        system->start(getEntities());
         for (const auto e : _entity_map) {
-            system->apply_for(e.first);
+            if (system->requirements(e.second))
+                system->forEach(e.second);
         }
-        system->post();
+        system->finish(getEntities());
     }
+    _tickCount++;
 }
 
 template<class T>
 std::shared_ptr<T> GECS::get_component(const ENTITY_ID id) {
     for (const auto& c : _component_map) {
-        if (c.second->get_entity() == id) {
+        if (c.second->_entity_id == id) {
             auto casted = std::dynamic_pointer_cast<T>(c.second);
             if (casted) return casted;
         }
@@ -224,18 +245,34 @@ std::shared_ptr<T> GECS::get_component(const ENTITY_ID id) {
 template<class T>
 bool GECS::has_component(const ENTITY_ID id) const {
     for (const auto& c : _component_map) {
-        if (c.second->get_entity() == id && std::dynamic_pointer_cast<T>(c.second)) return true;
+        if (c.second->_entity_id == id && std::dynamic_pointer_cast<T>(c.second)) return true;
     }
     return false;
 }
 
 template<class T>
-bool System::hasComponent() const {
-    return _gecs->has_component<T>(_entity);
+bool Entity::has() const {
+    return _gecs->has_component<T>(this->_id);
 }
 
 template<class T>
-std::shared_ptr<T> System::getComponent() {
-    return _gecs->get_component<T>(_entity);
+std::shared_ptr<T> Entity::get() const {
+    return _gecs->get_component<T>(this->_id);
 }
+
+template<class T>
+COMPONENT_ID Entity::attach(std::shared_ptr<T> component) {
+    if (has<T>()) {
+        return -1;
+    }
+    return _gecs->createAndAttachComponent(component, _id);
+}
+
+template<class T>
+std::shared_ptr<T> Entity::detach() {
+    auto comp = get<T>();
+    _gecs->detachComponentFromEntity(comp->getId());
+    return _gecs->removeComponent(comp->getId());
+}
+
 #endif //GECS_GECS_H

@@ -14,56 +14,53 @@ class GECS;
 
 class System {
     friend class GECS;
-
-    SYSTEM_ID _id   = -1;
-    ENTITY_ID _entity = -1;
+    SYSTEM_ID _id = -1;
     GECS* _gecs;
-
-    virtual void pre();
-    virtual void post();
-    virtual void apply();
-    void apply_for(ENTITY_ID entity);
-
-    void set_id(SYSTEM_ID id);
-    void set_gecs(GECS* gecs);
-
+    System(SYSTEM_ID id, GECS* gecs);
     SYSTEM_ID get_id() const;
     GECS* get_gecs() const;
+    void set_id(SYSTEM_ID id);
+    void set_gecs(GECS* gecs);
+    ENTITY_ID _entity = -1;
+
+    virtual void start(const std::vector<Entity>& entities);
+    virtual void finish(const std::vector<Entity>& entities);
+    virtual void forEach(const Entity& entity);
+
+    virtual bool requirements(const Entity& entity);
+
+    void apply_for(ENTITY_ID entity);
+    bool requirements_for(ENTITY_ID entity);
 
 protected:
-    explicit System();
-    template <class T> bool hasComponent() const;
-    template <class T> std::shared_ptr<T> getComponent();
-
+    System();
 public:
     virtual ~System() = default;
+    SYSTEM_ID getId() const;
 };
 
-inline void System::pre() {}
+inline System::System(const SYSTEM_ID id, GECS* gecs) : _id{id}, _gecs{gecs} {}
 
-inline void System::post() {}
+inline void System::start(const std::vector<Entity>& entities) {}
 
-inline void System::apply() {}
+inline void System::finish(const std::vector<Entity>& entities) {}
 
-inline void System::apply_for(const ENTITY_ID entity) {
-    _entity = entity;
-    apply();
+inline void System::forEach(const Entity& entity) {}
+
+inline void System::set_gecs(GECS *gecs) {
+    this->_gecs = gecs;
 }
 
 inline void System::set_id(const SYSTEM_ID id) {
     this->_id = id;
 }
 
-inline SYSTEM_ID System::get_id() const {
+inline bool System::requirements(const Entity& entity) {
+    return true;
+}
+
+inline SYSTEM_ID System::getId() const {
     return this->_id;
-}
-
-inline void System::set_gecs(GECS* gecs) {
-    this->_gecs = gecs;
-}
-
-inline GECS* System::get_gecs() const {
-    return _gecs;
 }
 
 inline System::System() : _gecs{nullptr} {}
